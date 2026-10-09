@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Solar</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+    var escena, renderer, camara, controls;
+
+    // Configurar aspectos de renderizado
+    renderer = new THREE.WebGLRenderer({antialias:true});
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    renderer.setSize(width, height);
+    document.body.appendChild(renderer.domElement);
+
+    // Crear escena
+    escena = new THREE.Scene();
+    //escena.background = new THREE.TextureLoader().load('tex_planetas/2k_stars_milky_way.jpg');
+
+    // Cámara
+    camara = new THREE.PerspectiveCamera(30, width / height, 1, 10000);
+    camara.position.set(-50, 50, 1500);
+    var luz = new THREE.PointLight(0xFFFFFF);
+    luz.position.set(10, 20, -400);
+    escena.add(luz);
+
+    // Geometría y textura de los planetas y asteroides
+    var geoSol = new THREE.SphereGeometry(696, 32, 24);
+    var texSol = new THREE.MeshBasicMaterial({color:0x20dbca,wireframe:true});
+    var Sol = new THREE.Mesh(geoSol, texSol);
+    Sol.position.set(0, 0, 0);
+    Sol.scale.set(0.05, 0.05, 0.05);
+    escena.add(Sol);
+
+    var geoMerc = new THREE.SphereGeometry(2.439, 32, 24);
+    var texMerc = texSol;
+    var Mercurio = new THREE.Mesh(geoMerc, texMerc);
+    Mercurio.position.set(69.8, 0, 0);
+    escena.add(Mercurio);
+
+    var geoVen = new THREE.SphereGeometry(6.052, 32, 24);
+    var texVen = texSol;
+    var Venus = new THREE.Mesh(geoVen, texVen);
+    Venus.position.set(108.2, 0, 0);
+    escena.add(Venus);
+
+    var geoTierra = new THREE.SphereGeometry(6.378, 32, 24);
+    var texTierra = texSol;
+    var tierra = new THREE.Mesh(geoTierra, texTierra);
+    tierra.position.set(150, 0, 0);
+    escena.add(tierra);
+
+    var geoMarte = new THREE.SphereGeometry(3.390, 32, 24);
+    var texMarte = texSol;
+    var Marte = new THREE.Mesh(geoMarte, texMarte);
+    Marte.position.set(231.94, 0, 0);
+    escena.add(Marte);
+
+    var geoJupiter = new THREE.SphereGeometry(71.6, 32, 24);
+    var texJupiter = texSol;
+    var Jupiter = new THREE.Mesh(geoJupiter, texJupiter);
+    Jupiter.position.set(782.33, 0, 0);
+    escena.add(Jupiter);
+
+    var geoSatur = new THREE.SphereGeometry(5.8232, 32, 24);
+    var texSatur = texSol;
+    var Saturno1 = new THREE.Mesh(geoSatur, texSatur);
+
+    var geoSatur2 = new THREE.TorusGeometry(10, 1, 2, 200);
+    var texSatur2 =  texSol;
+    var Saturno2 = new THREE.Mesh(geoSatur2, texSatur2);
+    Saturno2.rotation.x = Math.PI / 2;
+
+    var Saturno = new THREE.Group();
+    Saturno.add(Saturno1);
+    Saturno.add(Saturno2);
+    escena.add(Saturno);
+
+    var geoAst = new THREE.SphereGeometry(10, 6, 24);
+    var texAst =  texSol;
+    var Asteroide = new THREE.Mesh(geoAst, texAst);
+    Asteroide.position.set(-100, 0, -500);
+    escena.add(Asteroide);
+
+    var Asteroide2 = new THREE.Mesh(geoAst, texAst);
+    Asteroide2.position.set(-100, 0, -500);
+    escena.add(Asteroide2);
+
+    var Asteroide3 = new THREE.Mesh(geoAst, texAst);
+    Asteroide3.position.set(-100, 0, -500);
+    escena.add(Asteroide3);
+
+    var Asteroide4 = new THREE.Mesh(geoAst, texAst);
+    Asteroide4.position.set(-100, 0, -500);
+    escena.add(Asteroide4);
+
+    // Sistema de partículas para el rastro de fuego
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 500;
+    const positions = new Float32Array(particlesCount * 3);
+    for (let i = 0; i < particlesCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+    }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particlesMaterial = new THREE.PointsMaterial({
+        color: 0xff4500,
+        size: 0.5,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+    });
+    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+    escena.add(particles);
+
+    // Controles de la cámara
+    controls = new THREE.OrbitControls(camara, renderer.domElement);
+    var i = 0;
+
+    function animar() {
+        requestAnimationFrame(animar);
+
+        // Actualizar el sistema de partículas para seguir a uno de los asteroides
+        particles.position.copy(Asteroide.position);
+
+        // Movimiento de los asteroides
+        Asteroide.position.z += 1;
+        Asteroide2.position.z += 1.2;
+        Asteroide2.position.x += 1.2;
+        Asteroide3.position.z += 0.8;
+        Asteroide3.position.x += 0.5;
+        Asteroide4.position.z += 0.7;
+        Asteroide4.position.x += 1.2;
+
+        // Traslación de los planetas
+        Mercurio.position.set(-Math.cos(i * 0.004789) * 69.8, 0, Math.sin(i * 0.004789) * 69.8);
+        Venus.position.set(-Math.cos(i * 0.003503) * 108, 0, Math.sin(i * 0.003503) * 108);
+        tierra.position.set(-Math.cos(i * 0.002978) * 150, 0, Math.sin(i * 0.002978) * 150);
+        Marte.position.set(-Math.cos(i * 0.002413) * 231.94, 0, Math.sin(i * 0.002413) * 231.94);
+        Jupiter.position.set(-Math.cos(i * 0.001306) * 782.33, 0, Math.sin(i * 0.001306) * 782.33);
+        Saturno.position.set(-Math.cos(i * 0.00962) * 1418 / 3, 0, Math.sin(i * 0.00962) * 1418 / 3);
+
+        // Rotación de los planetas
+        Mercurio.rotation.x += 0.01; Mercurio.rotation.y += 0.01; Mercurio.rotation.z += 0.01;
+        tierra.rotation.x += 0.04; tierra.rotation.y += 0.04; tierra.rotation.z += 0.04;
+        Venus.rotation.x += 0.01; Venus.rotation.y += 0.01; Venus.rotation.z += 0.01;
+        Marte.rotation.x += 0.07; Marte.rotation.y += 0.07; Marte.rotation.z += 0.07;
+        Jupiter.rotation.x += 0.01; Jupiter.rotation.y += 0.01; Jupiter.rotation.z += 0.01;
+
+        Sol.rotation.x += 0.0005;
+        Sol.rotation.y += 0.0005;
+        Sol.rotation.z += 0.0005;
+
+        renderer.render(escena, camara);
+        i++;
+    }
+    animar();
+</script>
+</body>
+</html>
