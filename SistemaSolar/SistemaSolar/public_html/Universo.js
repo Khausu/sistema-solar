@@ -226,6 +226,99 @@ escena.add(Asteroide4);
 
 
 
+    //FIGURAS GEOMETRICAS ESTATICAS (three.js)
+    //Sin animacion: solo se agregan a la escena en posiciones fijas
+
+function cargarTex(nombre){
+    return new THREE.TextureLoader().load('tex_planetas/' + nombre);
+}
+
+//1. COHETE: ConeGeometry (punta y aletas) + CylinderGeometry (cuerpo)
+var Cohete = new THREE.Group();
+var cohCuerpo = new THREE.Mesh(
+    new THREE.CylinderGeometry(15, 15, 70, 32),
+    new THREE.MeshBasicMaterial({map: cargarTex('panel_cilindro.jpg')}));
+var cohPunta = new THREE.Mesh(
+    new THREE.ConeGeometry(15, 35, 32),
+    new THREE.MeshBasicMaterial({map: cargarTex('neb_cono.jpg')}));
+cohPunta.position.y = 52.5;
+Cohete.add(cohCuerpo);
+Cohete.add(cohPunta);
+for (var a = 0; a < 3; a++) {
+    var aleta = new THREE.Mesh(
+        new THREE.ConeGeometry(8, 30, 4),
+        new THREE.MeshBasicMaterial({map: cargarTex('neb_cono.jpg')}));
+    var ang = a * Math.PI * 2 / 3;
+    aleta.position.set(Math.cos(ang) * 20, -30, Math.sin(ang) * 20);
+    Cohete.add(aleta);
+}
+Cohete.position.set(-1000, 0, 900);
+escena.add(Cohete);
+
+//2. TORRE / FARO: CylinderGeometry (torre) + ConeGeometry (techo) + TorusGeometry (aro)
+var Torre = new THREE.Group();
+var torreCuerpo = new THREE.Mesh(
+    new THREE.CylinderGeometry(10, 20, 90, 32),
+    new THREE.MeshBasicMaterial({map: cargarTex('panel_cilindro.jpg')}));
+var torreTecho = new THREE.Mesh(
+    new THREE.ConeGeometry(14, 25, 32),
+    new THREE.MeshBasicMaterial({map: cargarTex('neb_cono.jpg')}));
+torreTecho.position.y = 57.5;
+var torreAro = new THREE.Mesh(
+    new THREE.TorusGeometry(16, 2, 16, 48),
+    new THREE.MeshBasicMaterial({map: cargarTex('plasma_torus.jpg')}));
+torreAro.rotation.x = Math.PI / 2;
+torreAro.position.y = 30;
+Torre.add(torreCuerpo);
+Torre.add(torreTecho);
+Torre.add(torreAro);
+Torre.position.set(-800, 0, 1000);
+escena.add(Torre);
+
+//3. PLANETA ANILLADO: RingGeometry (disco de hielo) + esfera central
+var Anillado = new THREE.Group();
+var anilloNucleo = new THREE.Mesh(
+    new THREE.SphereGeometry(20, 32, 24),
+    new THREE.MeshBasicMaterial({map: cargarTex('neb_cono.jpg')}));
+var anilloDisco = new THREE.Mesh(
+    new THREE.RingGeometry(30, 60, 64),
+    new THREE.MeshBasicMaterial({map: cargarTex('anillo_hielo.jpg'), side: THREE.DoubleSide}));
+anilloDisco.rotation.x = Math.PI / 2.4;
+Anillado.add(anilloNucleo);
+Anillado.add(anilloDisco);
+Anillado.position.set(-600, 0, 1100);
+escena.add(Anillado);
+
+//4. ESTACION ESPACIAL: TorusGeometry (rueda) + CylinderGeometry (eje)
+var Estacion = new THREE.Group();
+var estRueda = new THREE.Mesh(
+    new THREE.TorusGeometry(40, 8, 24, 64),
+    new THREE.MeshBasicMaterial({map: cargarTex('plasma_torus.jpg')}));
+var estEje = new THREE.Mesh(
+    new THREE.CylinderGeometry(5, 5, 90, 24),
+    new THREE.MeshBasicMaterial({map: cargarTex('panel_cilindro.jpg')}));
+estEje.rotation.x = Math.PI / 2;
+Estacion.add(estRueda);
+Estacion.add(estEje);
+Estacion.position.set(-400, 0, 1200);
+escena.add(Estacion);
+
+//5. CRISTAL COSMICO: TorusKnotGeometry + esfera interna
+var Cristal = new THREE.Group();
+var cristalNudo = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(30, 8, 128, 16),
+    new THREE.MeshBasicMaterial({map: cargarTex('cristal_knot.jpg')}));
+var cristalNucleo = new THREE.Mesh(
+    new THREE.SphereGeometry(10, 24, 16),
+    new THREE.MeshBasicMaterial({map: cargarTex('plasma_torus.jpg')}));
+Cristal.add(cristalNudo);
+Cristal.add(cristalNucleo);
+Cristal.position.set(-200, 0, 1300);
+escena.add(Cristal);
+
+
+
+
 //Camara
 camara= new THREE.PerspectiveCamera(30,width / height,1,9999999);
 camara.position.set(2000,600,1800);
